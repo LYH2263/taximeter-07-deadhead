@@ -14,3 +14,7 @@ th,td { border-bottom:1px solid #443820; padding:0.35rem; }
 .hero-num { font-size:2rem; color:var(--accent); font-weight:700; }
 input { background:#120e06; border:1px solid var(--muted); color:var(--text); padding:0.3rem; }
 a { color: var(--accent); }
+.muted { color: var(--muted); font-size:0.9rem; }
+.err { color:#ff6b4a; background:#3a1410; border:1px solid #ff6b4a; padding:0.5rem; border-radius:4px; }
+label { display:inline-flex; align-items:center; gap:0.3rem; margin-right:1rem; }
+h2 { margin-top:0; }

@@ -11,6 +11,15 @@ def init_db():
     CREATE TABLE IF NOT EXISTS trips(id INTEGER PRIMARY KEY, label TEXT, distance_km REAL, slow_min REAL, night INTEGER);
     CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT);
     CREATE TABLE IF NOT EXISTS calc_runs(id INTEGER PRIMARY KEY, kind TEXT, trip_id INTEGER, input_json TEXT, result_json TEXT, created_at TEXT);
+    CREATE TABLE IF NOT EXISTS dead_km_rates(
+        id INTEGER PRIMARY KEY,
+        code TEXT UNIQUE,
+        name TEXT,
+        price_per_km REAL NOT NULL CHECK(price_per_km > 0),
+        active INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT,
+        updated_at TEXT
+    );
     """)
     if conn.execute("SELECT COUNT(*) c FROM tariff").fetchone()["c"] == 0:
         conn.execute("INSERT INTO tariff(start_price,start_include_km,per_km,per_slow_min,night_factor) VALUES (11,3,2.5,0.8,1.2)")
@@ -20,5 +29,11 @@ def init_db():
         r = calc_fare(5, 2, False, TARIFF)
         conn.execute("INSERT INTO calc_runs(kind,trip_id,input_json,result_json,created_at) VALUES ('fare',1,?,?,datetime('now'))",
             (json.dumps({"distance_km":5,"slow_min":2,"night":False}), json.dumps(r)))
+        conn.commit()
+    if conn.execute("SELECT COUNT(*) c FROM dead_km_rates").fetchone()["c"] == 0:
+        conn.execute(
+            "INSERT INTO dead_km_rates(code,name,price_per_km,active,created_at,updated_at) VALUES (?,?,?,?,datetime('now'),datetime('now'))",
+            ("standard", "标准空驶单价", 1.5, 1),
+        )
         conn.commit()
     conn.close()
